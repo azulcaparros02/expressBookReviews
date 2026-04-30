@@ -49,11 +49,28 @@ public_users.get('/', async function (req, res) {
     }
   });
 
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  const isbn = req.params.isbn
-  return res.send(books[isbn])
- });
+// Task 11: Get book details based on ISBN using Promises
+public_users.get('/isbn/:isbn', function (req, res) {
+    const isbn = req.params.isbn;
+
+    // Creamos una promesa para buscar el libro de forma asíncrona
+    const findBook = new Promise((resolve, reject) => {
+        const book = books[isbn];
+        if (book) {
+            resolve(book);
+        } else {
+            reject("Book not found");
+        }
+    });
+
+    findBook
+        .then((book) => {
+            res.status(200).send(JSON.stringify(book, null, 4));
+        })
+        .catch((err) => {
+            res.status(404).json({ message: err });
+        });
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
