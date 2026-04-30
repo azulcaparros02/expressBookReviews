@@ -72,33 +72,64 @@ public_users.get('/isbn/:isbn', function (req, res) {
         });
 });
   
-// Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  const requestedAuthor = req.params.author;
-  let foundBook = [];
-  let bookKeys = Object.keys(books);
-  bookKeys.forEach((key) => {
-    if (books[key].author === requestedAuthor )
-   {foundBook.push(books[key]);}
-  }
-    
+public_users.get('/author/:author', function (req, res) {
+    const requestedAuthor = req.params.author;
 
-  )
-  return res.send(JSON.stringify(foundBook, null, 4));
+    const findBooksByAuthor = new Promise((resolve, reject) => {
+        let foundBooks = [];
+        let bookKeys = Object.keys(books);
+        
+        bookKeys.forEach((key) => {
+            if (books[key].author === requestedAuthor) {
+                foundBooks.push(books[key]);
+            }
+        });
+
+        if (foundBooks.length > 0) {
+            resolve(foundBooks);
+        } else {
+            reject("No books found for this author");
+        }
+    });
+
+    findBooksByAuthor
+        .then((books) => {
+            res.status(200).send(JSON.stringify(books, null, 4));
+        })
+        .catch((err) => {
+            res.status(404).json({ message: err });
+        });
 });
 
-// Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+// Task 13: Get book details based on title using Promises
+public_users.get('/title/:title', function (req, res) {
     const requestedTitle = req.params.title;
-    let foundBook = [];
-    let bookKeys = Object.keys(books);
-    bookKeys.forEach((key) => {
-      if (books[key].title === requestedTitle )
-     {foundBook.push(books[key]);}
-    }
-    )
-    return res.send(JSON.stringify(foundBook, null, 4));
-  });
+
+    const findBooksByTitle = new Promise((resolve, reject) => {
+        let foundBooks = [];
+        let bookKeys = Object.keys(books);
+
+        bookKeys.forEach((key) => {
+            if (books[key].title === requestedTitle) {
+                foundBooks.push(books[key]);
+            }
+        });
+
+        if (foundBooks.length > 0) {
+            resolve(foundBooks);
+        } else {
+            reject("No books found with this title");
+        }
+    });
+
+    findBooksByTitle
+        .then((books) => {
+            res.status(200).send(JSON.stringify(books, null, 4));
+        })
+        .catch((err) => {
+            res.status(404).json({ message: err });
+        });
+});
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
