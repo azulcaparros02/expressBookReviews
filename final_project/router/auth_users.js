@@ -55,33 +55,28 @@ regd_users.post("/login", (req,res) => {
 
 
 
-// Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-    // 1. Agarramos el ISBN de la URL
-    const isbn = req.params.isbn;
-    
-    // 2. Buscamos el libro en nuestra base de datos
-    let book = books[isbn];
-  
-    // 3. Verificamos si el libro existe
-    if (book) {
-        // Agarramos la reseña de la "query" (lo que va después del ? en la URL)
-        let review = req.query.review;
-        
-        // Agarramos el nombre de usuario de la sesión que guardamos en el Login
-        let username = req.session.authorization['username'];
-  
-        if(review) {
-            // Acá ocurre la magia: 
-            // Si el usuario no tenía reseña, la crea. Si ya tenía, la sobreescribe.
-            book.reviews[username] = review;
-            return res.status(200).send(`The review for the book with ISBN ${isbn} has been added/updated.`);
-        } else {
-            return res.status(400).json({message: "Review is missing"});
-        }
-    }
-    return res.status(404).json({message: "Book not found"});
-  });
+  const isbn = req.params.isbn;
+  let book = books[isbn];
+
+  if (book) {
+      let review = req.query.review;
+      let username = req.session.authorization['username'];
+
+      if(review) {
+          book.reviews[username] = review;
+          
+
+          return res.status(200).json({
+              message: `The review for the book with ISBN ${isbn} has been added/updated.`,
+              reviews: book.reviews 
+          });
+      } else {
+          return res.status(400).json({message: "Review is missing"});
+      }
+  }
+  return res.status(404).json({message: "Book not found"});
+});
 
   // Delete a book review
 regd_users.delete("/auth/review/:isbn", (req, res) => {
